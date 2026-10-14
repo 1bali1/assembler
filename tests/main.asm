@@ -1,1 +1,3 @@
-LD R1, R4
+LD R1, 0xff
+LD R4, 0xf
+LD R3, R4

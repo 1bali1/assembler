@@ -43,9 +43,20 @@ const InstructionDef* getInstruction(char line[])
     {
         if(strcmp(instructions[i].mnemonic, token) == 0)
         {
-            printf("got instruction: %s\n", instructions[i].mnemonic);
-
             return &instructions[i];
+        }
+    }
+
+    return NULL;
+}
+
+const uint8_t* getRegisterId(char token[])
+{
+    for (size_t i = 0; i < sizeof(registers) / sizeof(registers[0]); i++)
+    {
+        if (strcmp(registers[i].name, token) == 0)
+        {
+            return &registers[i].id;
         }
     }
 
@@ -95,17 +106,30 @@ int main()
 
             if (operandToken == NULL) { return 1; }
 
-            for (size_t i = 0; i < sizeof(registers) / sizeof(registers[0]); i++)
+            const uint8_t* registerId = getRegisterId(operandToken);
+
+            if (registerId == NULL)
             {
-                if (strcmp(registers[i].name, operandToken) == 0)
+                char* endPtr;
+                long immedValue = strtol(operandToken, &endPtr, 0);
+
+                if (*endPtr == '\0')
                 {
-                    fwrite(&registers[i].id, sizeof(registers[i].id), 1, outputFile);
-
-                    break;
+                    uint16_t val = (uint16_t)immedValue;
+                    fwrite(&val, sizeof(val), 1, outputFile);
                 }
-            }
-        }
+                else
+                {
+                    fprintf(stderr, "Unrecognized token: %s\n", operandToken);
 
+                    return 1;
+                }
+
+                continue;
+            }
+
+            fwrite(registerId, sizeof(*registerId), 1, outputFile);
+        }
     }
 
     fclose(file);
