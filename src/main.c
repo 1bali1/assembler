@@ -33,14 +33,11 @@ static const RegisterDef registers[] =
     { "R5", 0x05 }
 };
 
-InstructionDef* getInstruction(char line[])
+const InstructionDef* getInstruction(char line[])
 {
     char* token = strtok(line, " ");
 
-    if (token == NULL)
-    {
-        return NULL;
-    }
+    if (token == NULL) { return NULL; }
 
     for (size_t i = 0; i < sizeof(instructions) / sizeof(instructions[0]); i++)
     {
@@ -51,6 +48,8 @@ InstructionDef* getInstruction(char line[])
             return &instructions[i];
         }
     }
+
+    return NULL;
 }
 
 int main()
@@ -77,9 +76,9 @@ int main()
 
     while(fgets(line, sizeof(line), file))
     {
-        if (line[0] == "") continue;
+        if (line[0] == '\n') continue;
 
-        InstructionDef* instruction = getInstruction(line);
+        const InstructionDef* instruction = getInstruction(line);
 
         if (instruction == NULL)
         {
@@ -89,6 +88,24 @@ int main()
         }
 
         fwrite(&instruction->opcode, sizeof(instruction->opcode), 1, outputFile);
+
+        for (size_t i = 0; i < 2; i++)
+        {
+            char* operandToken = strtok(NULL, " ,\t\n\r");
+
+            if (operandToken == NULL) { return 1; }
+
+            for (size_t i = 0; i < sizeof(registers) / sizeof(registers[0]); i++)
+            {
+                if (strcmp(registers[i].name, operandToken) == 0)
+                {
+                    fwrite(&registers[i].id, sizeof(registers[i].id), 1, outputFile);
+
+                    break;
+                }
+            }
+        }
+
     }
 
     fclose(file);
