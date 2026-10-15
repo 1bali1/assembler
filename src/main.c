@@ -20,7 +20,10 @@ typedef struct
 
 static const InstructionDef instructions[] =
 {
-    { "LD", 0x10 }
+    { "LD", 0x10 },
+    { "ADD", 0x11 },
+    { "SUB", 0x12 },
+    { "XOR", 0x13 }
 };
 
 static const RegisterDef registers[] =
@@ -41,7 +44,7 @@ const InstructionDef* getInstruction(char line[])
 
     for (size_t i = 0; i < sizeof(instructions) / sizeof(instructions[0]); i++)
     {
-        if(strcmp(instructions[i].mnemonic, token) == 0)
+        if (strcmp(instructions[i].mnemonic, token) == 0)
         {
             return &instructions[i];
         }

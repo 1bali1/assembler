@@ -1,3 +1,6 @@
 LD R1, 0xff
 LD R4, 0xf
 LD R3, R4
+XOR R3
+SUB R3, 0b10
+ADD R4, R3
